@@ -8,29 +8,17 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @State private var isNight = false
+    
     var body: some View {
         ZStack {
-            LinearGradient(gradient: Gradient(colors: [.blue, Color("secondGradientColor")]),
-                           startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea(.all)
+            BackgroundView(isNight: $isNight)
+            
             VStack {
-               Text("Murmansk, Russia")
-                    .font(.system(size: 32,weight: .medium, design: .default))
-                    .foregroundColor(.white)
-                    .padding()
+            CityTextView(cityName: "Murmansk, Russia")
                 
-                VStack(spacing: 10) {
-                    Image(systemName: "cloud.sun.fill")
-                        .renderingMode(.original)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 180, height: 180)
-                    Text("-20°")
-                        .font(.system(size: 76,weight: .medium, design: .default))
-                        .foregroundColor(.white)
-                }
-                
-                .padding(.bottom, 60)
+                MainWeatherStatusView(imageName: isNight ? "moon.stars.fill" : "cloud.sun.fill", temperature: -20)
                 
                 HStack(spacing: 10) {
                   
@@ -57,14 +45,18 @@ struct ContentView: View {
                 Spacer()
                 
                 Button {
-                    print("tapped")
+                    
+                    isNight.toggle()
+                    
                 } label: {
-                    Text("Change Day Time")
-                        .font(.system(size: 20,weight: .medium, design: .default))
-                        .foregroundColor(.blue)
-                        .frame(width: 280, height: 50)
-                        .background(.white)
-                        .cornerRadius(10)
+                    isNight ? WeatherButton(buttonText: "Change Day Time",
+                                        buttonForegroundColor: .white,
+                                            buttonBackgroungColor: .black) :
+                    WeatherButton(buttonText: "Change Day Time",
+                                        buttonForegroundColor: .blue,
+                                            buttonBackgroungColor: .white)
+                    
+                
                 }
                 
                 Spacer()
@@ -107,3 +99,48 @@ struct WeatherDayView: View {
         }
     }
 }
+
+struct BackgroundView: View {
+    
+    @Binding var isNight: Bool
+    
+    var body: some View {
+        LinearGradient(gradient: Gradient(colors: [isNight ? .black : .blue, isNight ? .gray : Color  ("secondGradientColor")]),
+                       startPoint: .topLeading, endPoint: .bottomTrailing)
+            .ignoresSafeArea(.all)
+    }
+}
+
+struct CityTextView: View {
+    var cityName: String
+    
+    var body: some View {
+           Text(cityName)
+                .font(.system(size: 32,weight: .medium, design: .default))
+                .foregroundColor(.white)
+                .padding()
+    }
+}
+
+struct MainWeatherStatusView: View {
+    
+    var imageName: String
+    var temperature: Int
+    
+    var body: some View {
+        
+        VStack(spacing: 10) {
+            Image(systemName: imageName)
+                .renderingMode(.original)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 180, height: 180)
+            Text("\(temperature)°")
+                .font(.system(size: 76,weight: .medium, design: .default))
+                .foregroundColor(.white)
+        }
+        
+        .padding(.bottom, 60)
+    }
+}
+
